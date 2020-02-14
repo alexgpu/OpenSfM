@@ -39,8 +39,8 @@ class RelativePose : public Model<RelativePose, 1, 10> {
     const auto x = d.first.normalized();
     const auto y = d.second.normalized();
 
-    Eigen::Matrix<double, 3, 2> bearings;
-    Eigen::Matrix<double, 3, 2> centers;
+    Eigen::Matrix<double, 3, -1> bearings(3, 2);
+    Eigen::Matrix<double, 3, -1> centers(3, 2);
     centers.col(0) << Eigen::Vector3d::Zero();
     centers.col(1) << -rotation.transpose()*translation;
     bearings.col(0) << x;

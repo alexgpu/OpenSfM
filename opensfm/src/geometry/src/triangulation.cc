@@ -101,33 +101,6 @@ py::object TriangulateBearingsDLT(const py::list &Rts_list,
   return TriangulateReturn(TRIANGULATION_OK, foundation::py_array_from_data(X.data(), 3));
 }
 
-// Point minimizing the squared distance to all rays
-// Closed for solution from
-//   Srikumar Ramalingam, Suresh K. Lodha and Peter Sturm
-//   "A generic structure-from-motion framework"
-//   CVIU 2006
-Eigen::Vector3d TriangulateBearingsMidpointSolve(
-    const Eigen::Matrix<double, 3, Eigen::Dynamic> &os,
-    const Eigen::Matrix<double, 3, Eigen::Dynamic> &bs) {
-  int nviews = bs.cols();
-  assert(nviews == os.cols());
-  assert(nviews >= 2);
-
-  Eigen::Matrix3d BBt;
-  Eigen::Vector3d BBtA, A;
-  BBt.setZero();
-  BBtA.setZero();
-  A.setZero();
-  for (int i = 0; i < nviews; ++i) {
-    BBt += bs.col(i) * bs.col(i).transpose();
-    BBtA += bs.col(i) * bs.col(i).transpose() * os.col(i);
-    A += os.col(i);
-  }
-  Eigen::Matrix3d Cinv = (nviews * Eigen::Matrix3d::Identity() - BBt).inverse();
-
-  return (Eigen::Matrix3d::Identity() + BBt * Cinv) * A / nviews - Cinv * BBtA;
-}
-
 py::object TriangulateBearingsMidpoint(const py::list &os_list,
                                        const py::list &bs_list,
                                        const py::list &threshold_list,
